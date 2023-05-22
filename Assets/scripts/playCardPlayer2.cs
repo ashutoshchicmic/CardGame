@@ -1,71 +1,102 @@
+#region IMPORT LIBRARIES
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-public class playCardPlayer2 : MonoBehaviour
+using System.Linq;
+#endregion
+
+public class PlayCardPlayer2 : MonoBehaviour
 {
-    gameManager gm;
-    List<Card> player2Cards;
-    List<Card> playedCards;
+    #region FIELDS
+    GameManager gameManager;
+    private List<Card> Player2Cards;
+    private bool IsCardMatch = true;
     public TextMeshProUGUI cardNum;
     public TextMeshProUGUI previousCardNum;
     public GameObject place1;
     public GameObject place2;
-    bool yes = true;
+    #endregion
+
+
+    #region MONOBEHAVIOUR METHODS
     private void Start()
     {
-        Invoke("hello", 0.5f);
+        // Wait for a short delay and then initialize the game manager
+        Invoke(nameof(InitializeGameManager), 0.5f);
     }
-    void hello()
+    #endregion
+
+
+    // Initialize the game manager and player 2 cards
+    private void InitializeGameManager()
     {
-        gm = FindAnyObjectByType<gameManager>();
-        player2Cards = gm.player2Hand;
+        gameManager = FindAnyObjectByType<GameManager>();
+        Player2Cards = gameManager.player2Hand;
     }
+
+    // Call the PlayTurn() function when the "PLACE" button is clicked
+    #region "PLACE" BUTTON CLICKED
+
     public void PlayTurn()
     {
         place1.SetActive(true);
         place2.SetActive(false);
-        Debug.Log("player 2 count cards" + player2Cards.Count);
-        // Simulating player turns
-        if (player2Cards.Count > 0)
-        {
-            Card playerCard = player2Cards[0];
-            cardNum.text = playerCard.Value.ToString();
-            if (yes)
-            {
-                Card previousCard = gm.playedCards[gm.playedCards.Count - 1];
-                previousCardNum.text = previousCard.Value.ToString();
-                Debug.Log("Player 2 plays: " + playerCard.ToString());
-                //Debug.Log("Player 2 plays: " + player2Card.ToString());
+        Debug.Log("Player 2 card count: " + Player2Cards.Count);
 
-                if (playerCard.Value == previousCard.Value)
+        // Check if player 2 has any cards left to play
+        if (Player2Cards.Count > 0)
+        {
+            Card playerCard = Player2Cards[0];
+            cardNum.text = GetCardValue(playerCard).ToString();
+
+            if (IsCardMatch)
+            {
+                // Get the previous card played by player 1
+                Card previousCard = gameManager.playedCards.Last();
+                previousCardNum.text = GetCardValue(previousCard).ToString();
+                Debug.Log("Player 2 plays: " + playerCard.ToString());
+
+                // Check if the player 2 card matches the previous card
+                if (GetCardValue(playerCard) == GetCardValue(previousCard))
                 {
                     Debug.Log("Cards match! Player 2 wins the round.");
 
-                    player2Cards.AddRange(gm.playedCards);
-                    gm.playedCards = new List<Card>();
-                    yes = false;
+                    // Add the played cards to player 2's hand and clear the played cards list
+                    Player2Cards.AddRange(gameManager.playedCards);
+                    gameManager.playedCards = new List<Card>();
+                    IsCardMatch = false;
                     place1.SetActive(false);
                     place2.SetActive(true);
                 }
                 else
                 {
                     Debug.Log("Cards do not match. Next round.");
-                    gm.playedCards.Add(playerCard);
-                    //playedCards.Add(player2Card);
+
+                    // Add the player 2 card to the played cards list
+                    gameManager.playedCards.Add(playerCard);
                 }
             }
             else
             {
-                gm.playedCards.Add(playerCard);
-                yes = true;
+                // Add the player 2 card to the played cards list
+                gameManager.playedCards.Add(playerCard);
+                IsCardMatch = true;
             }
-            player2Cards.RemoveAt(0);
-            //gm.player2Hand.RemoveAt(0);
+
+            // Remove the played card from player 2's hand
+            Player2Cards.RemoveAt(0);
         }
         else
         {
             Debug.Log("Game over.");
         }
+    }
+    #endregion
+
+    // Get the value of a card
+    private int GetCardValue(Card card)
+    {
+        return card.Value;
     }
 }
