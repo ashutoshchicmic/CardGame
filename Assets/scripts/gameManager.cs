@@ -1,6 +1,7 @@
 #region IMPORT LIBRARIES
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 #endregion
 // Enumeration for the card suits
 public enum CardSuit
@@ -18,11 +19,13 @@ public class Card
 {
     public int Value { get; private set; }
     public CardSuit Suit { get; private set; }
+    public Sprite Sprite { get; private set; }
 
-    public Card(int value, CardSuit suit)
+    public Card(int value, CardSuit suit, Sprite sprite)
     {
         Value = value;
         Suit = suit;
+        Sprite = sprite;
     }
 
     public override string ToString()
@@ -40,6 +43,8 @@ public class GameManager : MonoBehaviour
     public List<Card> player1Hand;      // Player 1's hand
     public List<Card> player2Hand;      // Player 2's hand
     public List<Card> playedCards = new List<Card>();    // List of cards played in the game
+    
+    int spriteNumber = 0;
 
     #endregion
 
@@ -47,10 +52,11 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        deck = GenerateDeck();       // Generate a new deck of cards
-        ShuffleDeck();               // Shuffle the deck
         player1Hand = new List<Card>();
         player2Hand = new List<Card>();
+        deck = GenerateDeck();       // Generate a new deck of cards
+        ShuffleDeck();               // Shuffle the deck
+        
 
         // Distribute cards to players
         for (int i = 0; i < 26; i++)
@@ -66,17 +72,21 @@ public class GameManager : MonoBehaviour
     List<Card> GenerateDeck()
     {
         List<Card> newDeck = new List<Card>();
-
+        string spriteName = "cardSprite";
+        print(spriteName);
+        
+        Sprite[] sprite = Resources.LoadAll<Sprite>(spriteName);
         // Loop through the card suits and values to create all the cards
         for (int suit = 0; suit < 4; suit++)
         {
             for (int value = 1; value <= 13; value++)
             {
-                Card card = new Card(value, (CardSuit)suit);
+                Card card = new Card(value, (CardSuit)suit, sprite[spriteNumber]);
+                spriteNumber++;
                 newDeck.Add(card);
             }
         }
-
+        print(spriteNumber);
         return newDeck;
     }
 
