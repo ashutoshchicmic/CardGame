@@ -10,7 +10,7 @@ using UnityEngine.UI;
 public class PlayCardPlayer2 : MonoBehaviour
 {
     #region FIELDS
-    GameManager gameManager;
+    CreatingCards creatingCards;
     private List<Card> Player2Cards;
     private bool CardPresent = true;
     public TextMeshProUGUI cardNum;
@@ -36,8 +36,8 @@ public class PlayCardPlayer2 : MonoBehaviour
     // Initialize the game manager and player 2 cards
     private void InitializeGameManager()
     {
-        gameManager = FindAnyObjectByType<GameManager>();
-        Player2Cards = gameManager.player2Hand;
+        creatingCards = FindAnyObjectByType<CreatingCards>();
+        Player2Cards = creatingCards.player2Hand;
     }
 
     // Call the PlayTurn() function when the "PLACE" button is clicked
@@ -57,12 +57,12 @@ public class PlayCardPlayer2 : MonoBehaviour
             DisplayCardSprite(playerCard,cardSpriteImage);
             
             // Add the player 2 card to the played cards list
-            gameManager.playedCards.Add(playerCard);
+            creatingCards.playedCards.Add(playerCard);
 
             if (CardPresent)
             {
                 // Get the previous card played by player 1
-                Card previousCard = gameManager.playedCards.ElementAt(gameManager.playedCards.Count - 2);
+                Card previousCard = creatingCards.playedCards.ElementAt(creatingCards.playedCards.Count - 2);
                 previousCardNum.text = GetCardValue(previousCard).ToString();
                 DisplayCardSprite(previousCard, previousCardSpriteImage);
                 Debug.Log("Player 2 plays: " + playerCard.ToString());
@@ -73,8 +73,8 @@ public class PlayCardPlayer2 : MonoBehaviour
                     Debug.Log("Cards match! Player 2 wins the round.");
 
                     // Add the played cards to player 2's hand and clear the played cards list
-                    Player2Cards.AddRange(gameManager.playedCards);
-                    gameManager.playedCards = new List<Card>();
+                    Player2Cards.AddRange(creatingCards.playedCards);
+                    creatingCards.playedCards = new List<Card>();
                     CardPresent = false;
                     place1.SetActive(false);
                     place2.SetActive(true);
