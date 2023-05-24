@@ -86,7 +86,7 @@ public class CreatingCards : MonoBehaviour
                 newDeck.Add(card);
             }
         }
-        print(spriteNumber);
+        Debug.Log(spriteNumber);
         return newDeck;
     }
 

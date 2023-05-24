@@ -9,23 +9,28 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    #region FIELDS
+    #region PRIVATE FIELDS
 
     private CreatingCards creatingCards;
     private bool cardPresent = false; // This will tell whether card is present on the table or not
-    private List<Card> currentPlayerCards;
+    private List<Card> currentPlayerDeck;
     private List<Card> player1Cards;
     private List<Card> player2Cards;
     private List<Card> playedCards;
-    public TextMeshProUGUI player1CardsCountText;
-    public TextMeshProUGUI player2CardsCountText;
-    public TextMeshProUGUI playedCardsCountText;
-    public GameObject place1Button;
-    public GameObject place2Button;
-    public GameObject gameOverText;
-    public Image cardSpriteImage; // Reference to the UI element for displaying card sprite
-    public Image previousCardSpriteImage;  // Reference to the UI element for displaying previous card sprite
-    public Sprite noCardSprite;
+
+    #endregion
+
+    #region SERIALIZED FIELDS
+
+    [SerializeField] private TextMeshProUGUI player1CardsCountText;
+    [SerializeField] private TextMeshProUGUI player2CardsCountText;
+    [SerializeField] private TextMeshProUGUI playedCardsCountText;
+    [SerializeField] private GameObject place1Button;
+    [SerializeField] private GameObject place2Button;
+    [SerializeField] private GameObject gameOverText;
+    [SerializeField] private Image cardSpriteImage; // Reference to the UI element for displaying card sprite
+    [SerializeField] private Image previousCardSpriteImage;  // Reference to the UI element for displaying previous card sprite
+    [SerializeField] private Sprite noCardSprite;
 
     #endregion
 
@@ -33,6 +38,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        
         // Wait for a short delay and then initialize the game manager
         Invoke(nameof(InitializeCreatingCards), 0.05f);
         playedCards = new();
@@ -61,22 +67,22 @@ public class GameManager : MonoBehaviour
 
         if (currentPlayer)
         {
-            currentPlayerCards = player1Cards;
+            currentPlayerDeck = player1Cards;
         }
         else
         {
-            currentPlayerCards = player2Cards;
+            currentPlayerDeck = player2Cards;
         }
         #endregion
 
         place1Button.SetActive(!currentPlayer);
         place2Button.SetActive(currentPlayer);
-        Debug.Log("Player card count: " + currentPlayerCards.Count);
+        Debug.Log("Player card count: " + currentPlayerDeck.Count);
 
         // Check if the current player has any cards left to play
-        if (currentPlayerCards.Count > 0)
+        if (currentPlayerDeck.Count > 0)
         {
-            Card currentPlayerCard = currentPlayerCards[0];
+            Card currentPlayerCard = currentPlayerDeck[0];
 
             // Display the card sprite for the current player's card
             DisplayCardSprite(currentPlayerCard, cardSpriteImage);
@@ -99,17 +105,12 @@ public class GameManager : MonoBehaviour
                     Debug.Log("Cards match! Player wins the round.");
 
                     // Add the played cards to the current player's hand and clear the played cards list
-                    currentPlayerCards.AddRange(playedCards);
+                    currentPlayerDeck.AddRange(playedCards);
                     playedCards.Clear();
                     cardPresent = false;
 
                     place1Button.SetActive(currentPlayer);
                     place2Button.SetActive(!currentPlayer);
-                }
-
-                else
-                {
-                    Debug.Log("Cards do not match. Next round.");
                 }
             }
 
@@ -122,17 +123,7 @@ public class GameManager : MonoBehaviour
             playedCardsCountText.text = $"{playedCards.Count}";
 
             // Remove the played card from the current player's hand
-            currentPlayerCards.RemoveAt(0);
-
-            if (currentPlayer)
-            {
-                player1Cards = currentPlayerCards;
-            }
-
-            else
-            {
-                player2Cards = currentPlayerCards;
-            }
+            currentPlayerDeck.RemoveAt(0);
 
             //Updating the Count text
             player1CardsCountText.text = $"{player1Cards.Count}";
